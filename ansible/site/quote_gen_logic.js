@@ -14,7 +14,6 @@ var quotes = [
     'Your time is limited, so don\’t waste it living someone else\’s life. \– Steve Jobs',
     'Whatever you do, do with all your might. – Marcus Tullius Cicero'
 ]
-
 function newQuote(){
     var randomNumber = Math.floor(Math.random() * (quotes.length));
     document.getElementById('quoteDisplay').innerHTML = quotes[randomNumber];

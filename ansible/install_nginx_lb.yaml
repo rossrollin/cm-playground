@@ -12,20 +12,10 @@
       become: yes
     - name: Setup nginx conf
       template:
-        src=/shared/ansible/nginx.conf
-        dest=/etc/nginx.conf
+        src=/shared/ansible/default-lb
+        dest=/etc/nginx/nginx.conf
     - name: start nginx
       service:
           name: nginx
           state: started
-      become: yes
-    - name: copy the nginx config file and restart nginx
-      copy:
-        src: /shared/ansible/default-lb
-        dest: /etc/nginx/sites-enabled/
-      become: yes
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
       become: yes

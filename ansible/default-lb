@@ -1,8 +1,13 @@
-upstream website {
+events { 
+        worker_connections 1024;
+}
+http {
+  include /etc/nginx/sites-enabled/*;
+  upstream website {
         server 172.0.0.10;
         server 172.0.0.20;
 }
-server {
+  server {
         listen 80 default_server;
         listen [::]:80 default_server ipv6only=on;
         root /usr/share/nginx/html;
@@ -12,3 +17,6 @@ server {
                 proxy_pass http://website;
         }
 }
+}
+
+

@@ -15,9 +15,13 @@
         src: /shared/ansible/site/
         dest: /usr/share/nginx/html/
         mode: 0644
-      notify: restart nginx
     - name: copy the nginx config file
       copy:
         src: /shared/ansible/default
-        dest: /etc/nginx/sites-enabled/
+        dest: /etc/nginx/nginx.conf
       become: yes
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+      

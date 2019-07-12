@@ -2,8 +2,6 @@
 - hosts: management
   become: true
   tasks:
-  - name: Run script to install crontab
-    script: /tmp/monitoring/create_crontab.sh
   - name: Install mailutils postfix for sending emails 
     apt: pkg={{ item }} update_cache=yes
     with_items:

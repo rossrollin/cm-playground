@@ -6,6 +6,7 @@ CPU = 1
 RAM = 512
 VM = 'ubuntu/bionic64'
 
+# This is a default setting for vagrant to use a provider. '2' is the API version and should not be changed
 Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.memory = RAM
@@ -16,6 +17,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "load-balancer" do |lb|
     lb.vm.box = VM
+    lb.vm.hostname = "lb.dev"
     lb.vm.network "private_network", ip: "172.0.0.5"
     lb.vm.network "forwarded_port", guest: 80, host: 8082
     lb.vm.provision "shell", inline: <<-SHELL
@@ -23,7 +25,6 @@ Vagrant.configure("2") do |config|
       sudo cp /shared/.ssh/id_rsa.pub /home/vagrant/.ssh/authorized_keys
     SHELL
   end
-
   config.vm.define "nginx-one" do |none|
     none.vm.box = VM
     none.vm.hostname = "web-01.dev"
@@ -63,15 +64,13 @@ Vagrant.configure("2") do |config|
     amgt01.ssh.forward_agent = true
     amgt01.vm.provision "shell", inline: <<-SHELL
       sudo apt-get update -yq
-      sudo apt install dos2unix
       sudo apt-get install -y ansible
       sudo chown vagrant:vagrant /etc/ansible
       sudo cp /shared/ansible/ansible.cfg /etc/ansible/ansible.cfg
       cp /shared/.ssh/id_rsa /tmp/id_rsa
       sudo cp /shared/.ssh/id_rsa.pub /home/vagrant/.ssh/authorized_keys
       sudo chmod 600 /tmp/id_rsa
-      # This is an example of where I've had to create a file on the fly because creating it in
-      # Windows and importing it into the vagrant box will break some functionality of some kind
+      # The below command creates an ansible hosts file 
       sudo echo -e "
       [loadbalancer]
       172.0.0.5
@@ -84,13 +83,6 @@ Vagrant.configure("2") do |config|
       ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/install_nginx.yaml
       ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/install_nginx_lb.yaml
       ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/sudoers.yaml
-      scp -r /shared/monitoring /tmp
-      sudo echo -e "
-      http://172.0.0.5:80
-      http://172.0.0.10:80
-      http://172.0.0.20:80" >> /tmp/monitoring/sites.txt
-      sudo dos2unix /tmp/monitoring/monitoring.sh
-      ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/install_mail_utils.yaml
     SHELL
   end
 end

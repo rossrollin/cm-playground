@@ -1,58 +1,39 @@
-## AL Technical Test
-    Note: This submission assumes the 'provider' for Vagrant will be VirtualBox,
-          so virtualbox will be required on the host of this submission. 
-          Furthermore, this solution was developed on a Windows 10 machine, and 
-          files created on windows machines don't always automatically work on 
-          linux. Whilst every attempt has been made to ensure this solution is 
-          portable, some bugs may still occur. 
+# Config Management Playground
 
-### Below are the steps to get you up and running immediately with my submission
+This Repo is designed to be used as a tool to learn configuration management(CM). The structure is a skeleton which uses vagrant to spin up VM's inside VirtualBox with IP addresses, the idea being you use these VM's as targets - then install your choice of config management tool inside a CM management box, and from there administer payloads to the targets as you would do in a live environment. Do not use vagrant built-in config management tools, you will learn nothing.    
 
-    1. Go to the location you have unzipped the tar '../vgtest' in any terminal
-    2. Run: vagrant up
-    3. Go to your favourite browser and type localhost:8082, you will see a Hello World 
-    written in html (and a button you can play with :))
-    4. I have installed a mail server, on the ansible-mgmt01 box. If you knockout one of 
-    the nginx boxes, I will receive an alert(if your laptop is connected to WiFi). Do so now using 'vagrant destroy nginx-one'
-    5. To test it for yourself, you can ssh to the ansible mgmt box via 
-    'ssh -i id_rsa -o StrictHostKeyChecking=no vagrant@172.0.0.100' and 
-    edit /tmp/monitoring/monitoring.sh(using vim), and add your email to the list of 'EMAILS'. These can be comma seperated.
-    The crontab is set to run every minute, but you can manually run the script if you do not wish to wait. Alternatively you can edit the script from /vgtest/monitoring/monitoring.sh and redeploy the stack.
+## Contents
 
-### So what has been achieved?
+1. Vagrantfile
+2. Sample ansible folder.
 
-    1. Create a vagrantfile that creates a single machine using ubuntu/bionic64 and install a CM tool
-    2. Install nginx via CM (see ansible/install_nginx.yaml and the nginx-one.vm inside the vagrantfile)
-    3. Run a simple test using vagrant shell provisioner (The test was a curl - it has been commented out because its now defunct but left in the vagrantfile as evidence )
-    4. Update contents of sudoers using CM (see ansible/sudoers.yaml)
-    5. Create a simple Hello World web app (see ansible/site)
-    6. Ensure the web app is available via nginx (localhost:8082)
-    7. Extend the vagrantfile to deploy 2 webservers and a load balancer, which serves traffic between the 2 web servers. (see /vgtest/ansible/default-lb)
-    8. Test in an automated fashion that both app servers are working. (see /vgtest/monitoring folder)
+### Getting Started
+    Requirements: it is required that you have;
+        1. VirtualBox installed
+        2. Vagrant installed
+
+1. Start with your objective in mind - i.e. spin up a highly available web stack and use the CM tool of choice to configure the web servers and deploy code to both web servers.
+2. Configure the vagrantfile to configure a set of VM's, and use one of those VM's as the config management system to configure the rest of the VM's.
+3. A sample vagrantfile and ansible setup are included in this repo. 
+4. Ansible uses SSH to configure hosts. You will be required to configure your own SSH Keys on the targets. If you are unsure of how to do this look it up on google/youtube.
+
+### Using Vagrant
+
+When you have written a vagrantfile, use vagrant up in the command line in the same directory as your vagrant file and it will spin up your resources inside virtualbox, and execute the CM commands.
+
+### Sample Objective
+
+if you do not know what you want to achieve here is an example objective of a system you could potentially deploy;
+
+    1. Create a Vagrantfile that creates a single machine using this box: https://app.vagrantup.com/ubuntu/boxes/bionic64 and installs the latest released version of your chosen configuration management tool.
+    2. Install the nginx webserver via configuration management.
+    3. Run a simple test using Vagrant's shell provisioner to ensure that nginx is listening on port 80
+    4. Again, using configuration management, update contents of /etc/sudoers file so that Vagrant user can sudo without a password and that anyone in the admin group can sudo with a password.
+    5. Make the solution idempotent so that re-running the provisioning step will not restart nginx unless changes have been made
+    6. Create a simple "Hello World" web application in your favourite language of choice.
+    7. Ensure your web application is available via the nginx instance.
+    8. Extend the Vagrantfile to deploy this webapp to two additional vagrant machines and then configure the nginx to load balance between them.
+    9. Test (in an automated fashion) that both app servers are working, and that the nginx is serving the content correctly.
+    10. Have the webapp be dynamic - e.g. perform a db query for inclusion in the response (such as picking a random quote from a database) or calling an API of your choice(e.g. weather).
+    11. Any additional resources (e.g. a shared db server) should be set up by the Vagrant file 
  
-### Whats in the folders?
-
-There a list of folders included in the zip, these files all serve some purpose (except bootstrap, these were part of the first iteration of this solution and are now defunct, but are a talking point)
-
-#### Ansible
-
-This folder contains all of the config management files used to meet the solutions requirements. 
-The website deployment subfolder is also located here.
-
-#### Monitoring
-
-This folder contains the monitoring scripts which are installed into crontab on ansible-mgmt01, and monitor the http of the web servers and load balancer.
-
-## Appendix
-
-Here is a list of IP addresses and useful copy/pastes to help you navigate this submission
-
-Server IP's <br />
-    Loadbalancer:   172.0.0.5 <br /> 
-    nginx-one:      172.0.0.10 <br />
-    nginx-two:      172.0.0.20 <br />
-    ansible-mgmt01: 172.0.0.100 <br />
-
-If you require `ssh` into any of the boxes use: 
-    `ssh -i id_rsa -o StrictHostKeyChecking=no vagrant@<ip>`  <br />
-id_rsa is located in /vgtest/.ssh/

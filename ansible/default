@@ -1,7 +1,18 @@
-server {
+events { 
+        worker_connections 1024;
+}
+http {
+  include /etc/nginx/sites-enabled/*;
+  server {
         listen 80 default_server;
         listen [::]:80 default_server ipv6only=on;
-        root /usr/share/nginx/html;
-        index index.html index.htm;
+        location ~* \.(js|jpg|png|css)$ 
+        {
+                root /usr/share/nginx/html;
+                index index.html index.htm;
+                expires 30d;
+        }
+        
         server_name localhost;
+        }
 }
