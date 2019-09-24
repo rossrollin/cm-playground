@@ -60,7 +60,7 @@ One crucial way to organize your playbook content is Ansible’s “roles” org
 Directory Layout
 
 The top level of the directory would contain files and directories like so:
-
+```
 production                # inventory file for production servers
 staging                   # inventory file for staging environment
 
@@ -103,4 +103,4 @@ roles/
     webtier/              # same kind of structure as "common" was above, done for the webtier role
     monitoring/           # ""
     fooapp/               # ""
-
+```
