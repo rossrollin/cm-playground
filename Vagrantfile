@@ -5,12 +5,13 @@
 CPU = 1
 RAM = 512
 VM = 'ubuntu/bionic64'
-
+TIMEOUT = 600
 # This is a default setting for vagrant to use a provider. '2' is the API version and should not be changed
 Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.memory = RAM
     vb.cpus = CPU
+  config.vm.boot_timeout = TIMEOUT
   end
   #Share the root directory of where the vagrantfile is located into /shared on each guest
   config.vm.synced_folder ".", "/shared", type: "nfs"
@@ -80,11 +81,9 @@ Vagrant.configure("2") do |config|
       [management]
       172.0.0.100" > /etc/ansible/hosts
       sudo chown vagrant:vagrant /tmp/id_rsa
+      ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/sudoers.yaml
       ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/install_nginx.yaml
       ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/install_nginx_lb.yaml
-      ansible-playbook --private-key=/tmp/id_rsa -u vagrant /shared/ansible/sudoers.yaml
     SHELL
   end
 end
-
-

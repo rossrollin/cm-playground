@@ -1,0 +1,36 @@
+- hosts: web
+  become: true
+  tasks:
+    - name: Install latest nginx 
+      apt: name=nginx state=latest
+      become: yes
+      notify:
+        - start nginx
+    - name: Remove current nginx.conf
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      become: yes
+    - name: Copy site folder
+      copy:
+        src: /shared/ansible/site/
+        dest: /usr/share/nginx/html/
+        mode: 0644
+    - name: copy the nginx config file
+      copy:
+        src: /shared/ansible/configs/nginx/default
+        dest: /etc/nginx/nginx.conf
+      become: yes
+      notify:
+        - restart nginx
+  handlers:
+    - name: start nginx  
+      become: yes
+      service:
+        name: nginx
+        state: started
+    - name: restart nginx
+      become: yes
+      service:
+        name: nginx
+        state: restarted

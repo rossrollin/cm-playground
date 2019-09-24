@@ -1,0 +1,22 @@
+---
+- name: 1. install NGINX
+  apt: name=nginx state=latest
+  become: true
+- name: 2. remove default NGINX index 
+  become: true 
+  file: 
+    path: /var/www/html/index.html
+    state: absent
+- name: 3. remove default nginx config
+  become: yes 
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+- name: 4. add nginx conf 
+  become: yes
+  copy: src=/shared/ansible/configs/nginx/default dest=/etc/nginx/nginx.conf
+  notify: restart nginx
+- name: 5. Copy the site folder
+  become: yes
+  copy: src=/shared/ansible/roles/common/NGINX/files/ dest=/usr/share/nginx/html/
+  notify: restart nginx

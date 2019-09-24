@@ -12,7 +12,6 @@ http {
                 index index.html index.htm;
                 expires 30d;
         }
-        
         server_name localhost;
         }
 }
